@@ -100,7 +100,7 @@ namespace OrbisPRXLoader
             {
                 status.Text = "Awaiting to load SPRX";
                 connectButton.Text = "Reconnect via API";
-                api.Notify(222, "ItsJokerZz's\nMulti-COD GSC Loader:\n\nConnected Successfully!");
+                api.Notify(222, "ItsJokerZz's\nOrbisPRXLoader:\n\nConnected Successfully!");
             }
 
             status.Text = $"Status: {status.Text}";
@@ -108,9 +108,7 @@ namespace OrbisPRXLoader
 
         private async Task AnimateResizeAsync(int finalHeight, int step, bool grow = false)
         {
-            SemaphoreSlim resizeSemaphore = new SemaphoreSlim(1, 1);
-
-            await resizeSemaphore.WaitAsync();
+            SemaphoreSlim resizeSemaphore = new SemaphoreSlim(1, 1); await resizeSemaphore.WaitAsync();
 
             try
             {
@@ -119,8 +117,7 @@ namespace OrbisPRXLoader
                     int newHeight = grow ? Math.Min(Size.Height + step, finalHeight)
                         : Math.Max(Size.Height - step, finalHeight);
 
-                    Size = new Size(264, newHeight);
-                    await Task.Delay(10);
+                    Size = new Size(368, newHeight); await Task.Delay(10);
                 }
             }
             finally
@@ -147,17 +144,13 @@ namespace OrbisPRXLoader
             {
                 api.Connect();
             }
-            catch (Exception)
-            {
-                /* do nothing */
-            }
+            catch (Exception) { /* do nothing */ }
 
             if (api.IsConnected)
             {
                 Initiate.Text = "Reconnect via API";
                 Status.Text = "Status: Awaiting to load SPRX";
                 api.Notify(222, "ItsJokerZz's\nSPRXLoader:\n\nConnected Successfully!");
-                // await AnimateResizeAsync(274, 14, true);
             }
             else
             {
@@ -179,8 +172,7 @@ namespace OrbisPRXLoader
 
         private async void Exit_Click(object sender, EventArgs e)
         {
-            /* await AnimateResizeAsync(30, 14, false); */
-            Application.Exit();
+            await AnimateResizeAsync(30, 14, false); Application.Exit();
         }
 
         private async void Initiate_Click(object sender, EventArgs e)
@@ -203,13 +195,9 @@ namespace OrbisPRXLoader
 
             await ConnectViaAPI(IP, Status, Initiate);
 
-            if (Status.Text.Contains("Failed") &&
-                Size != new Size(Size.Width, 144)) return;
-            //  await AnimateResizeAsync(144, 14, false);
+            if (Status.Text.Contains("Failed")) return;
             else
             {
-                //  await AnimateResizeAsync(274, 14, true);
-
                 Properties.Settings.Default.ip = IP.Text;
                 Properties.Settings.Default.port = Port.Text;
                 Properties.Settings.Default.Save();
