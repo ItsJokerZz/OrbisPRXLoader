@@ -239,7 +239,6 @@
             this.PRXPath.Name = "PRXPath";
             this.PRXPath.Size = new System.Drawing.Size(162, 23);
             this.PRXPath.TabIndex = 48;
-            this.PRXPath.Text = "/data/gscloader/iw6/120.sprx";
             // 
             // IPTitle
             // 
