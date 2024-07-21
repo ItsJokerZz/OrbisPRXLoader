@@ -22,28 +22,26 @@ namespace OrbisPRXLoader
         [DllImport("user32.dll")]
         private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
-        private Dictionary<int, string> 
+        private Dictionary<int, string>
             prxHandleMapping = new Dictionary<int, string>();
 
         private FRAME4 api; private Socket socket;
 
-        private string status = "Awaiting Connection";
-     
+        private string status = "Awaiting Connection", binFile;
+
         private bool ConnectToBinLoader(string ip, string port)
         {
-            WebClient client = new WebClient();
-            status = "Awaiting Connection";
-            bool ret = false;
+            WebClient client = new WebClient(); bool ret = false;
 
             if (!IPAddress.TryParse(ip, out var ipAddress) || !int.TryParse(port, out var portNumber))
             {
-                status = "Invalid IP or Port";
-                return false;
+                status = "Invalid IP or Port"; return false;
             }
 
             try
             {
-                if (client.DownloadString($"http://{ipAddress}:9090/status").Contains("{ \"status\": \"ready\" }"))
+                string response = client.DownloadString($"http://{ipAddress}:9090/status");
+                if (response.Contains("{ \"status\": \"ready\" }"))
                 {
                     try
                     {
@@ -52,24 +50,21 @@ namespace OrbisPRXLoader
                         socket.SendTimeout = 3000;
                         socket.Connect(new IPEndPoint(ipAddress, portNumber));
 
-                        ret = true;
+                        status = "Attemping to Connect..."; ret = true;
                     }
-                    catch (Exception)
+                    catch
                     {
-                        status = "Failed to Send Payload";
-                        ret = false;
+                        status = "Failed to Connect to Bin Loader"; ret = false;
                     }
                 }
                 else
                 {
-                    status = "Bin Loader Not Ready";
-                    ret = false;
+                    status = "Bin Loader Not Ready"; ret = false;
                 }
             }
-            catch (WebException)
+            catch
             {
-                status = "Bin Server Not Found";
-                ret = false;
+                status = "Bin Server Not Found"; ret = false;
             }
 
             return ret;
@@ -77,7 +72,21 @@ namespace OrbisPRXLoader
 
         private string Payload()
         {
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "frame4.bin");
+            string resourceName = "OrbisPRXLoader.libframe4.frame4.bin";
+            string tempFile = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
+            binFile = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(tempFile) + ".bin");
+
+            File.Delete(Path.GetTempFileName());
+            using (Stream resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+            {
+                if (resource == null) throw new Exception($"Resource '{resourceName}' not found.");
+
+                using (FileStream file = new FileStream(binFile, FileMode.Create, FileAccess.Write))
+                {
+                    resource.CopyTo(file);
+                }
+            }
+            File.Delete(tempFile); return binFile;
         }
 
         private async Task ConnectViaAPI(TextBox ip, Label status, Button connectButton)
@@ -92,7 +101,7 @@ namespace OrbisPRXLoader
             }
             catch (Exception)
             {
-                status.Text = "Failed to Reconnect";
+                status.Text = "Failed to Connect";
                 connectButton.Text = "Connect via API";
             }
 
@@ -158,16 +167,20 @@ namespace OrbisPRXLoader
             }
         }
 
+        private void App_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (File.Exists(binFile) && binFile != null)
+                File.Delete(binFile);
+
+            if (api != null && api.IsConnected)
+                api.UnloadPayload();
+        }
+
         private new void MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
                 ReleaseCapture();
             SendMessage(Handle, 0xA1, 0x2, 0);
-        }
-
-        private void App_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (api != null && api.IsConnected) api.UnloadPayload();
         }
 
         private async void Exit_Click(object sender, EventArgs e)
@@ -240,13 +253,13 @@ namespace OrbisPRXLoader
 
                 string itemToAdd = $"{prxHandle} [{PRXPath.Text}]";
 
-                if (!comboBox1.Items.Contains(itemToAdd))
-                    comboBox1.Items.Add(itemToAdd);
+                if (!HandleID.Items.Contains(itemToAdd))
+                    HandleID.Items.Add(itemToAdd);
 
-                if (comboBox1.Items.Count == 0)
-                    comboBox1.Text = "";
+                if (HandleID.Items.Count == 0)
+                    HandleID.Text = "";
                 else
-                    comboBox1.Text = itemToAdd;
+                    HandleID.Text = itemToAdd;
             }
             catch
             {
@@ -256,7 +269,7 @@ namespace OrbisPRXLoader
 
         private void Unload_Click(object sender, EventArgs e)
         {
-            string selectedItem = comboBox1.Text;
+            string selectedItem = HandleID.Text;
             string handleText = Regex.Match(selectedItem, @"\d+").Value;
 
             if (int.TryParse(handleText, out int prxHandle))
@@ -267,14 +280,14 @@ namespace OrbisPRXLoader
                     {
 
                         api.UnloadPRX(Processes.Text, prxHandle);
-                        comboBox1.Items.Remove(selectedItem);
+                        HandleID.Items.Remove(selectedItem);
 
                         prxHandleMapping.Remove(prxHandle);
 
-                        if (comboBox1.Items.Count == 0)
-                            comboBox1.Text = "";
+                        if (HandleID.Items.Count == 0)
+                            HandleID.Text = "";
                         else
-                            comboBox1.Text = comboBox1.Items[comboBox1.Items.Count - 1].ToString();
+                            HandleID.Text = HandleID.Items[HandleID.Items.Count - 1].ToString();
 
                         Status.Text = "Status: Unloaded Successfully";
                     }

@@ -35,7 +35,7 @@
             this.background = new System.Windows.Forms.Panel();
             this.ProcessTitle = new System.Windows.Forms.Label();
             this.HandleIDTitle = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.HandleID = new System.Windows.Forms.ComboBox();
             this.UnloadPRX = new System.Windows.Forms.Button();
             this.LoadPRX = new System.Windows.Forms.Button();
             this.Processes = new System.Windows.Forms.ComboBox();
@@ -119,7 +119,7 @@
             this.background.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(28)))), ((int)(((byte)(28)))), ((int)(((byte)(28)))));
             this.background.Controls.Add(this.ProcessTitle);
             this.background.Controls.Add(this.HandleIDTitle);
-            this.background.Controls.Add(this.comboBox1);
+            this.background.Controls.Add(this.HandleID);
             this.background.Controls.Add(this.UnloadPRX);
             this.background.Controls.Add(this.LoadPRX);
             this.background.Controls.Add(this.Processes);
@@ -162,16 +162,16 @@
             this.HandleIDTitle.Text = "Handle ID:";
             this.HandleIDTitle.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // comboBox1
+            // HandleID
             // 
-            this.comboBox1.DropDownWidth = 320;
-            this.comboBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox1.Font = new System.Drawing.Font("Consolas", 9.75F);
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(188, 111);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(162, 23);
-            this.comboBox1.TabIndex = 55;
+            this.HandleID.DropDownWidth = 320;
+            this.HandleID.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HandleID.Font = new System.Drawing.Font("Consolas", 9.75F);
+            this.HandleID.FormattingEnabled = true;
+            this.HandleID.Location = new System.Drawing.Point(188, 111);
+            this.HandleID.Name = "HandleID";
+            this.HandleID.Size = new System.Drawing.Size(162, 23);
+            this.HandleID.TabIndex = 55;
             // 
             // UnloadPRX
             // 
@@ -372,7 +372,7 @@
         private System.Windows.Forms.ComboBox Processes;
         private System.Windows.Forms.Button UnloadPRX;
         private System.Windows.Forms.Button LoadPRX;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox HandleID;
         public System.Windows.Forms.Label ProcessTitle;
         public System.Windows.Forms.Label HandleIDTitle;
     }
